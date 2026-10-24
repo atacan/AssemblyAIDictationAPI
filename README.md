@@ -1,0 +1,130 @@
+# AssemblyAIDictationAPI
+
+Swift package generated from an OpenAPI specification. Run `make help` for build
+and code-generation commands.
+
+## Client products
+
+| Product | Contents |
+| --- | --- |
+| `AssemblyAIDictationAPITypes` | Generated models, operation inputs/outputs, and API protocol |
+| `AssemblyAIDictationAPI` | Generated client and shared authentication; accepts any `ClientTransport` |
+| `AssemblyAIDictationAPIURLSession` | `Client.urlSession(...)` convenience factory |
+| `AssemblyAIDictationAPIAsyncHTTPClient` | `Client.asyncHTTPClient(...)` convenience factory |
+
+Add the core product and your chosen convenience product to your application's
+target dependencies. Add the Types product as well if you import it directly.
+Both factories return the same `AssemblyAIDictationAPI.Client` and expose the same API.
+Factories are scaffolded by the bootstrapper after successful generation of both
+Types and Client. If generation fails during the initial bootstrap, fix the
+toolchain/specification and run `make regenerate` to complete setup.
+
+```swift
+import Foundation
+import AssemblyAIDictationAPI
+import AssemblyAIDictationAPIURLSession
+
+let client = Client.urlSession(
+    serverURL: URL(string: "https://api.example.com")!,
+    authentication: .bearer("YOUR_TOKEN")
+)
+```
+
+For AsyncHTTPClient, import `AssemblyAIDictationAPIAsyncHTTPClient` and use
+`Client.asyncHTTPClient(serverURL:authentication:)` with the same arguments.
+Use `.apiKey("YOUR_KEY")` for a header API key. These shorthand forms require
+exactly one scheme of the corresponding kind in the specification. For multiple
+or combined schemes, use their OpenAPI security scheme names:
+
+```swift
+let authentication = Authentication.credentials([
+    "BearerAuth": .init("YOUR_TOKEN"),
+    "ApiKeyAuth": .init("YOUR_KEY"),
+])
+```
+
+Dynamic credentials use an async, `@Sendable` provider, such as
+`Authentication.bearer { try await tokenStore.accessToken() }` or
+`Authentication.apiKey { try await keyStore.currentKey() }`. Named credentials
+support `.init(provider: { ... })` too. Providers run per authenticated request;
+the application handles token acquisition and refresh. Provider errors propagate.
+
+Authentication follows each operation's effective OpenAPI `security` requirements.
+Public operations (`security: []`) do not receive generated credentials. Schemes
+inside one requirement are combined; separate requirements are alternatives,
+selected in specification order when all credentials for one are available.
+An empty requirement (`{}`) permits anonymous access. Missing credentials or an
+unsupported required scheme cause an error before the request is sent. Factories
+default to `.none`, which works for public operations and reports missing
+credentials on protected operations. Built-in authentication supports bearer
+tokens and header API keys; use the original generated `Client` initializer with
+`transport:` and `middlewares:` for custom authentication.
+
+Both factories accept `configuration:` (OpenAPI runtime settings),
+`transportConfiguration:` (the upstream transport's configuration), and
+`middlewares:` (additional middleware). Additional middleware runs before shared
+authentication on outgoing requests. The default transports use their shared
+session/client. To inject your own, pass `URLSessionTransport.Configuration(session:)`
+or `AsyncHTTPClientTransport.Configuration(client:timeout:)`; import the upstream
+transport module and declare its product directly when using those types.
+The application owns any injected session/client and must manage its lifecycle;
+the package never invalidates or shuts it down. Do not shut down the shared client.
+
+For a custom transport, the core product provides
+`Client(serverURL:configuration:transport:authentication:middlewares:)`.
+
+Run `make regenerate` after changing the original specification or overlay.
+Authentication support and factory edits are preserved. Only
+`Sources/AssemblyAIDictationAPI/Authentication/GeneratedSecurity/OperationSecurity.swift`
+is rewritten to reflect the final overlaid specification. External or cyclic
+references in security schemes/path items are rejected; local references are supported.
+
+The core target has no dependency on either transport. Both transport packages
+are declared at package level, so target isolation does not guarantee that every
+SwiftPM/Xcode workflow avoids resolving or fetching an unused transport.
+
+## Secret scanning
+
+This repository includes Betterleaks and TruffleHog checks based on
+[this secret-scanning guide](https://actondon.com/blog/secret-scanning-for-git-repo).
+Activate the local hooks after initializing or cloning the Git repository:
+
+```bash
+brew install pre-commit
+pre-commit install
+```
+
+Alternatively, install pre-commit with `uv tool install pre-commit` or
+`pip install pre-commit`. Version 3.2 or newer is required. pre-commit downloads
+and builds the pinned scanners, bootstrapping Go if needed; its first run requires
+network access and can take a few minutes. The bootstrapper generates the
+configuration; each developer installs the hooks locally.
+
+On a commit, Betterleaks scans the staged diff and redacts its findings. TruffleHog
+scans the staged files supplied by pre-commit, which temporarily hides unstaged
+edits. Both work before the first commit. TruffleHog checks candidate credentials
+against provider APIs and blocks only verified, active secrets. Scanner execution
+errors also fail the checks. Run `pre-commit run` to check staged changes manually.
+
+The GitHub workflow runs on pushes and pull requests to every branch. It fetches
+full history to determine ranges, but scans incoming commits: push before-to-after
+and pull request merge-base-to-head. New branches are compared with the default
+branch when available; an initial repository push scans its imported history.
+Unchanged older history is outside subsequent CI scans. Both scanners run
+independently, so findings from either cause a failed workflow.
+
+OpenAPI specifications, overlays, examples, and generated Swift files are scanned.
+Keep real credentials in environment variables and leave only placeholders in
+examples. If a finding is a false positive, review the exact location before
+adding a targeted exception:
+
+- Betterleaks supports a `betterleaks:allow` comment on the relevant line or its reported
+  fingerprint in a root `.betterleaksignore` file.
+- TruffleHog supports a `trufflehog:ignore` comment on the relevant line.
+
+For formats that cannot contain comments, use a scanner-specific configuration or
+path exception limited to the affected fixture. Avoid excluding whole source or
+specification directories. Rotate and revoke any exposed real credential.
+
+Regenerating the package preserves existing hook configuration, workflow, and
+documentation files, including your edits.
