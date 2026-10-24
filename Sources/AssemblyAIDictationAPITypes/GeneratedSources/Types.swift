@@ -44,6 +44,13 @@ public protocol APIProtocol: Sendable {
     /// - Remark: HTTP `POST /v1/transcribe/live`.
     /// - Remark: Generated from `#/paths//v1/transcribe/live/post(transcribeDictation)`.
     func transcribeDictation(_ input: Operations.transcribeDictation.Input) async throws -> Operations.transcribeDictation.Output
+    /// Pre-warm the connection
+    ///
+    /// Open a connection before sending audio. No authentication is required. Call shortly before transcription using the same HTTP client and host so the transcription can reuse the connection pool. The response body is only an acknowledgement.
+    ///
+    /// - Remark: HTTP `GET /warm`.
+    /// - Remark: Generated from `#/paths//warm/get(warm)`.
+    func warm(_ input: Operations.warm.Input) async throws -> Operations.warm.Output
 }
 
 /// Convenience overloads for operation inputs.
@@ -94,6 +101,15 @@ extension APIProtocol {
             headers: headers,
             body: body
         ))
+    }
+    /// Pre-warm the connection
+    ///
+    /// Open a connection before sending audio. No authentication is required. Call shortly before transcription using the same HTTP client and host so the transcription can reuse the connection pool. The response body is only an acknowledgement.
+    ///
+    /// - Remark: HTTP `GET /warm`.
+    /// - Remark: Generated from `#/paths//warm/get(warm)`.
+    public func warm(headers: Operations.warm.Input.Headers = .init()) async throws -> Operations.warm.Output {
+        try await warm(Operations.warm.Input(headers: headers))
     }
 }
 

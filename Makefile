@@ -13,6 +13,9 @@ SHELL := /bin/bash
 SWIFT_FORMAT_OPTIONS := -i -p --ignore-unparsable-files --configuration .swift-format
 SWIFT_FORMAT_TARGETS := ./Sources ./Tests
 
+# Supports the shared client/transport layout and regenerates operation security.
+SWIFT_BOOTSTRAPPER_SOURCE ?= git+https://github.com/atacan/swift-package-generator-based-on-openapi.git@42f5c8476754022051abb789de175e30f238d3f2
+
 # Docker Settings
 DOCKER_IMAGE := swift:latest
 
@@ -82,7 +85,7 @@ test-on-linux: ## Run swift tests inside a Docker container
 		swift test
 
 regenerate:
-	uvx --from git+https://github.com/atacan/swift-package-generator-based-on-openapi.git swift-bootstrapper .
+	uvx --from "$(SWIFT_BOOTSTRAPPER_SOURCE)" swift-bootstrapper .
 
 generate: ## Generate Swift code from OpenAPI spec
 	@echo "$(YELLOW)Generating Swift code from OpenAPI specification...$(RESET)"

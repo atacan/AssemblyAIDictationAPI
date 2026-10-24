@@ -92,6 +92,18 @@ let package = Package(
                 .product(name: "HTTPTypes", package: "swift-http-types"),
             ]
         ),
+        // Opt-in live endpoint tests and offline upload regression tests.
+        .testTarget(
+            name: "AssemblyAIDictationAPILiveTests",
+            dependencies: [
+                .target(name: "AssemblyAIDictationAPI"),
+                .target(name: "AssemblyAIDictationAPITypes"),
+                .target(name: "AssemblyAIDictationAPIURLSession"),
+                .target(name: "AssemblyAIDictationAPIAsyncHTTPClient"),
+                .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+                .product(name: "HTTPTypes", package: "swift-http-types"),
+            ]
+        ),
         // Shared client and authentication tests
         .testTarget(
             name: "AssemblyAIDictationAPITests",

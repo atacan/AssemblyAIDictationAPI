@@ -188,6 +188,7 @@ paths:
                 audio:
                   type: string
                   format: binary
+                  contentMediaType: audio/wav
                   description: Audio bytes, at most 120 seconds. Set the part's Content-Type
                     to `audio/wav` for WAV or `audio/pcm` for raw 16-bit PCM. Compressed
                     formats (MP3, M4A, FLAC, OGG, WebM) are rejected with `415`. The
@@ -341,6 +342,31 @@ paths:
           \  throw new Error(error.error || error.detail);\n}\n\nconst result = await\
           \ response.json();\nconsole.log(result.text);         // verbatim transcript\n\
           console.log(result.llm_response); // default cleanup rewrite\n"
+  "/warm":
+    get:
+      summary: Pre-warm the connection
+      description: Open a connection before sending audio. No authentication is required.
+        Call shortly before transcription using the same HTTP client and host so the
+        transcription can reuse the connection pool. The response body is only an acknowledgement.
+      externalDocs:
+        url: https://www.assemblyai.com/docs/dictation/connection-pre-warming
+      operationId: warm
+      security: []
+      responses:
+        '200':
+          description: Connection is ready.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - warm
+                properties:
+                  warm:
+                    type: string
+                    example: toasty
+              example:
+                warm: toasty
 components:
   schemas:
     DictationResponse:

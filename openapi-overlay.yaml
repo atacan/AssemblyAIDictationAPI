@@ -41,4 +41,38 @@ info:
 #   - target: "$.components.schemas.LegacyModel.properties.oldField"
 #     remove: true
 
-actions: []
+actions:
+  # The generator ignores an encoding with multiple content types. Supply the
+  # WAV default on the schema so typed audio parts do not fall back to text/plain.
+  - target: "$.paths['/v1/transcribe/live'].post.requestBody.content['multipart/form-data'].schema.properties.audio"
+    update:
+      contentMediaType: audio/wav
+  - target: "$.paths"
+    update:
+      /warm:
+        get:
+          summary: Pre-warm the connection
+          description: >-
+            Open a connection before sending audio. No authentication is required.
+            Call shortly before transcription using the same HTTP client and host
+            so the transcription can reuse the connection pool. The response body
+            is only an acknowledgement.
+          externalDocs:
+            url: https://www.assemblyai.com/docs/dictation/connection-pre-warming
+          operationId: warm
+          security: []
+          responses:
+            '200':
+              description: Connection is ready.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    required:
+                      - warm
+                    properties:
+                      warm:
+                        type: string
+                        example: toasty
+                  example:
+                    warm: toasty

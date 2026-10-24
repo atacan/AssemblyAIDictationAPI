@@ -126,7 +126,7 @@ public struct Client: APIProtocol {
                                 let body = try converter.setRequiredRequestBodyAsBinary(
                                     value.body,
                                     headerFields: &headerFields,
-                                    contentType: "text/plain"
+                                    contentType: "audio/wav"
                                 )
                                 return .init(
                                     name: "audio",
@@ -342,6 +342,68 @@ public struct Client: APIProtocol {
                         preconditionFailure("bestContentType chose an invalid content type.")
                     }
                     return .gatewayTimeout(.init(body: body))
+                default:
+                    return .undocumented(
+                        statusCode: response.status.code,
+                        .init(
+                            headerFields: response.headerFields,
+                            body: responseBody
+                        )
+                    )
+                }
+            }
+        )
+    }
+    /// Pre-warm the connection
+    ///
+    /// Open a connection before sending audio. No authentication is required. Call shortly before transcription using the same HTTP client and host so the transcription can reuse the connection pool. The response body is only an acknowledgement.
+    ///
+    /// - Remark: HTTP `GET /warm`.
+    /// - Remark: Generated from `#/paths//warm/get(warm)`.
+    public func warm(_ input: Operations.warm.Input) async throws -> Operations.warm.Output {
+        try await client.send(
+            input: input,
+            forOperation: Operations.warm.id,
+            serializer: { input in
+                let path = try converter.renderedPath(
+                    template: "/warm",
+                    parameters: []
+                )
+                var request: HTTPTypes.HTTPRequest = .init(
+                    soar_path: path,
+                    method: .get
+                )
+                suppressMutabilityWarning(&request)
+                converter.setAcceptHeader(
+                    in: &request.headerFields,
+                    contentTypes: input.headers.accept
+                )
+                return (request, nil)
+            },
+            deserializer: { response, responseBody in
+                switch response.status.code {
+                case 200:
+                    let contentType = converter.extractContentTypeIfPresent(in: response.headerFields)
+                    let body: Operations.warm.Output.Ok.Body
+                    let chosenContentType = try converter.bestContentType(
+                        received: contentType,
+                        options: [
+                            "application/json"
+                        ]
+                    )
+                    switch chosenContentType {
+                    case "application/json":
+                        body = try await converter.getResponseBodyAsJSON(
+                            Operations.warm.Output.Ok.Body.jsonPayload.self,
+                            from: responseBody,
+                            transforming: { value in
+                                .json(value)
+                            }
+                        )
+                    default:
+                        preconditionFailure("bestContentType chose an invalid content type.")
+                    }
+                    return .ok(.init(body: body))
                 default:
                     return .undocumented(
                         statusCode: response.status.code,

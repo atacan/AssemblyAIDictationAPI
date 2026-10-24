@@ -9,5 +9,5 @@ internal enum OperationSecurity {
 
     static let schemes: [String: Scheme] = ["ApiKey": .apiKey(header: "authorization")]
     static let defaultRequirements: [[String]] = [["ApiKey"]]
-    static let operations: [String: [[String]]] = ["transcribeDictation": [["ApiKey"]]]
+    static let operations: [String: [[String]]] = ["transcribeDictation": [["ApiKey"]], "warm": []]
 }
