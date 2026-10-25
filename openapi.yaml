@@ -244,34 +244,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
-            x-codeSamples:
-                - lang: python
-                  label: Python SDK
-                  source: 'import assemblyai as aai
-
-
-                    aai.settings.api_key = "<YOUR_API_KEY>"
-
-
-                    result = aai.DictationTranscriber().transcribe_live("clip.wav")
-
-
-                    print(result.text)          # verbatim transcript
-
-                    print(result.llm_response)  # default cleanup rewrite
-
-                    print(result.final_text)    # the rewrite, falling back to the transcript
-
-'
-                - lang: bash
-                  label: cURL
-                  source: "curl -X POST https://dictation.assemblyai.com/v1/transcribe/live \\\n  -H 'Authorization: <YOUR_API_KEY>' \\\n  -F 'config={};type=application/json' \\\n  -F 'audio=@clip.wav;type=audio/wav'\n"
-                - lang: python
-                  label: Python
-                  source: "import requests\n\nwith open(\"clip.wav\", \"rb\") as f:\n    audio = f.read()\n\nresponse = requests.post(\n    \"https://dictation.assemblyai.com/v1/transcribe/live\",\n    headers={\"Authorization\": \"<YOUR_API_KEY>\"},\n    files={\n        # `config` first, and always present. `{}` means \"no settings\".\n        \"config\": (None, \"{}\", \"application/json\"),\n        \"audio\": (\"clip.wav\", audio, \"audio/wav\"),\n    },\n    timeout=90,\n)\nresponse.raise_for_status()\nresult = response.json()\n\nprint(result[\"text\"])          # verbatim transcript\nprint(result[\"llm_response\"])  # default cleanup rewrite\n"
-                - lang: javascript
-                  label: JavaScript
-                  source: "import { readFileSync } from \"fs\";\n\nconst audio = readFileSync(\"clip.wav\");\nconst form = new FormData();\n// `config` first, and always present. `{}` means \"no settings\".\nform.append(\"config\", new Blob([\"{}\"], { type: \"application/json\" }));\nform.append(\"audio\", new Blob([audio], { type: \"audio/wav\" }), \"clip.wav\");\n\nconst response = await fetch(\n  \"https://dictation.assemblyai.com/v1/transcribe/live\",\n  {\n    method: \"POST\",\n    headers: { Authorization: \"<YOUR_API_KEY>\" },\n    body: form,\n  }\n);\n\nif (!response.ok) {\n  const error = await response.json();\n  throw new Error(error.error || error.detail);\n}\n\nconst result = await response.json();\nconsole.log(result.text);         // verbatim transcript\nconsole.log(result.llm_response); // default cleanup rewrite\n"
     /v1/transcribe:
         post:
             summary: Transcribe recorded audio
@@ -459,16 +431,6 @@ paths:
                                 oneOf:
                                     - $ref: '#/components/schemas/ErrorResponse'
                                     - $ref: '#/components/schemas/DetailErrorResponse'
-            x-codeSamples:
-                - lang: bash
-                  label: cURL
-                  source: "curl -X POST https://dictation.assemblyai.com/v1/transcribe \\\n  -H 'Authorization: <YOUR_API_KEY>' \\\n  -F 'audio=@recording.mp3;type=audio/mpeg'\n"
-                - lang: python
-                  label: Python
-                  source: "import requests\n\nwith open(\"recording.mp3\", \"rb\") as f:\n    audio = f.read()\n\nresponse = requests.post(\n    \"https://dictation.assemblyai.com/v1/transcribe\",\n    headers={\"Authorization\": \"<YOUR_API_KEY>\"},\n    files={\n        \"audio\": (\"recording.mp3\", audio, \"audio/mpeg\"),\n        # Optional; omit for the defaults.\n        \"config\": (None, '{\"language_codes\": [\"en\"]}', \"application/json\"),\n    },\n    timeout=90,\n)\nresponse.raise_for_status()\nresult = response.json()\n\nprint(result[\"text\"])          # verbatim transcript\nprint(result[\"llm_response\"])  # default cleanup rewrite\n"
-                - lang: javascript
-                  label: JavaScript
-                  source: "import { readFileSync } from \"fs\";\n\nconst audio = readFileSync(\"recording.mp3\");\nconst form = new FormData();\nform.append(\"audio\", new Blob([audio], { type: \"audio/mpeg\" }), \"recording.mp3\");\n\nconst response = await fetch(\n  \"https://dictation.assemblyai.com/v1/transcribe\",\n  {\n    method: \"POST\",\n    headers: { Authorization: \"<YOUR_API_KEY>\" },\n    body: form,\n  }\n);\n\nif (!response.ok) {\n  const error = await response.json();\n  throw new Error(error.error || error.detail);\n}\n\nconst result = await response.json();\nconsole.log(result.text);         // verbatim transcript\nconsole.log(result.llm_response); // default cleanup rewrite\n"
     /warm:
         get:
             summary: Pre-warm the connection
