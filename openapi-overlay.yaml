@@ -47,6 +47,9 @@ actions:
   - target: "$.paths['/v1/transcribe/live'].post.requestBody.content['multipart/form-data'].schema.properties.audio"
     update:
       contentMediaType: audio/wav
+  - target: "$.paths['/v1/transcribe'].post.requestBody.content['multipart/form-data'].schema.properties.audio"
+    update:
+      contentMediaType: audio/wav
   - target: "$.paths"
     update:
       /warm:

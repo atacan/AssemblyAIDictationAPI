@@ -44,6 +44,31 @@ public protocol APIProtocol: Sendable {
     /// - Remark: HTTP `POST /v1/transcribe/live`.
     /// - Remark: Generated from `#/paths//v1/transcribe/live/post(transcribeDictation)`.
     func transcribeDictation(_ input: Operations.transcribeDictation.Input) async throws -> Operations.transcribeDictation.Output
+    /// Transcribe recorded audio
+    ///
+    /// Send a complete recording and receive text ready to send, together with
+    /// the verbatim transcript. Audio must be between 80 ms and 20 minutes,
+    /// and at most 256 MB.
+    ///
+    /// This endpoint takes audio you already hold in full. The server reads
+    /// the whole body before it starts transcribing, so the `config` part can
+    /// come before or after `audio`, and can be left out to use the defaults.
+    /// Besides WAV and raw PCM, it accepts compressed audio: AAC, MP3, M4A,
+    /// Ogg/Opus, FLAC, and WebM.
+    ///
+    /// For audio that is still being recorded, use
+    /// [`/v1/transcribe/live`](/api-reference/dictation-api/transcribe-live)
+    /// instead. It uploads while the user speaks and accepts up to 120 seconds
+    /// of WAV or raw PCM. The SDKs use `/v1/transcribe/live`, so this endpoint
+    /// is called over HTTP.
+    ///
+    /// This endpoint is also served at `/transcribe`, without the version
+    /// prefix.
+    ///
+    ///
+    /// - Remark: HTTP `POST /v1/transcribe`.
+    /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)`.
+    func transcribeDictationRecording(_ input: Operations.transcribeDictationRecording.Input) async throws -> Operations.transcribeDictationRecording.Output
     /// Pre-warm the connection
     ///
     /// Open a connection before sending audio. No authentication is required. Call shortly before transcription using the same HTTP client and host so the transcription can reuse the connection pool. The response body is only an acknowledgement.
@@ -98,6 +123,39 @@ extension APIProtocol {
         body: Operations.transcribeDictation.Input.Body
     ) async throws -> Operations.transcribeDictation.Output {
         try await transcribeDictation(Operations.transcribeDictation.Input(
+            headers: headers,
+            body: body
+        ))
+    }
+    /// Transcribe recorded audio
+    ///
+    /// Send a complete recording and receive text ready to send, together with
+    /// the verbatim transcript. Audio must be between 80 ms and 20 minutes,
+    /// and at most 256 MB.
+    ///
+    /// This endpoint takes audio you already hold in full. The server reads
+    /// the whole body before it starts transcribing, so the `config` part can
+    /// come before or after `audio`, and can be left out to use the defaults.
+    /// Besides WAV and raw PCM, it accepts compressed audio: AAC, MP3, M4A,
+    /// Ogg/Opus, FLAC, and WebM.
+    ///
+    /// For audio that is still being recorded, use
+    /// [`/v1/transcribe/live`](/api-reference/dictation-api/transcribe-live)
+    /// instead. It uploads while the user speaks and accepts up to 120 seconds
+    /// of WAV or raw PCM. The SDKs use `/v1/transcribe/live`, so this endpoint
+    /// is called over HTTP.
+    ///
+    /// This endpoint is also served at `/transcribe`, without the version
+    /// prefix.
+    ///
+    ///
+    /// - Remark: HTTP `POST /v1/transcribe`.
+    /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)`.
+    public func transcribeDictationRecording(
+        headers: Operations.transcribeDictationRecording.Input.Headers = .init(),
+        body: Operations.transcribeDictationRecording.Input.Body
+    ) async throws -> Operations.transcribeDictationRecording.Output {
+        try await transcribeDictationRecording(Operations.transcribeDictationRecording.Input(
             headers: headers,
             body: body
         ))

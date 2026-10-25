@@ -786,6 +786,843 @@ public enum Operations {
             }
         }
     }
+    /// Transcribe recorded audio
+    ///
+    /// Send a complete recording and receive text ready to send, together with
+    /// the verbatim transcript. Audio must be between 80 ms and 20 minutes,
+    /// and at most 256 MB.
+    ///
+    /// This endpoint takes audio you already hold in full. The server reads
+    /// the whole body before it starts transcribing, so the `config` part can
+    /// come before or after `audio`, and can be left out to use the defaults.
+    /// Besides WAV and raw PCM, it accepts compressed audio: AAC, MP3, M4A,
+    /// Ogg/Opus, FLAC, and WebM.
+    ///
+    /// For audio that is still being recorded, use
+    /// [`/v1/transcribe/live`](/api-reference/dictation-api/transcribe-live)
+    /// instead. It uploads while the user speaks and accepts up to 120 seconds
+    /// of WAV or raw PCM. The SDKs use `/v1/transcribe/live`, so this endpoint
+    /// is called over HTTP.
+    ///
+    /// This endpoint is also served at `/transcribe`, without the version
+    /// prefix.
+    ///
+    ///
+    /// - Remark: HTTP `POST /v1/transcribe`.
+    /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)`.
+    public enum transcribeDictationRecording {
+        public static let id: Swift.String = "transcribeDictationRecording"
+        public struct Input: Sendable, Hashable {
+            /// - Remark: Generated from `#/paths/v1/transcribe/POST/header`.
+            public struct Headers: Sendable, Hashable {
+                public var accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.transcribeDictationRecording.AcceptableContentType>]
+                /// Creates a new `Headers`.
+                ///
+                /// - Parameters:
+                ///   - accept:
+                public init(accept: [OpenAPIRuntime.AcceptHeaderContentType<Operations.transcribeDictationRecording.AcceptableContentType>] = .defaultValues()) {
+                    self.accept = accept
+                }
+            }
+            public var headers: Operations.transcribeDictationRecording.Input.Headers
+            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody`.
+            @frozen public enum Body: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm`.
+                @frozen public enum multipartFormPayload: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config`.
+                    public struct configPayload: Sendable, Hashable {
+                        /// Transcription and rewrite configuration. Optional; when omitted, the audio is transcribed with defaults, including the default rewrite. Only the fields below are accepted. An unknown field is rejected with a `400`.
+                        ///
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body`.
+                        public struct bodyPayload: Codable, Hashable, Sendable {
+                            /// Source sample rate in Hz, for example `16000`. Required when `audio` is `audio/pcm`. Not needed for WAV or compressed formats, which carry it in the file.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/sample_rate`.
+                            public var sample_rate: Swift.Int?
+                            /// Number of audio channels. Required when `audio` is `audio/pcm`. Not needed for WAV or compressed formats.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/channels`.
+                            public var channels: Swift.Int?
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/language_codesPayload`.
+                            @frozen public enum language_codesPayloadPayload: String, Codable, Hashable, Sendable, CaseIterable {
+                                case en = "en"
+                                case es = "es"
+                                case de = "de"
+                                case fr = "fr"
+                                case it = "it"
+                                case pt = "pt"
+                                case tr = "tr"
+                                case nl = "nl"
+                                case sv = "sv"
+                                case no = "no"
+                                case da = "da"
+                                case fi = "fi"
+                                case hi = "hi"
+                                case vi = "vi"
+                                case ar = "ar"
+                                case he = "he"
+                                case ja = "ja"
+                                case ur = "ur"
+                                case zh = "zh"
+                                case ko = "ko"
+                                case ca = "ca"
+                                case gl = "gl"
+                                case ru = "ru"
+                                case ro = "ro"
+                                case et = "et"
+                                case fa = "fa"
+                                case yue = "yue"
+                                case af = "af"
+                                case mr = "mr"
+                                case zu = "zu"
+                                case xh = "xh"
+                                case nn = "nn"
+                            }
+                            /// Language or languages of the audio, as ISO language codes. A code outside this set is rejected with a `400`. When omitted, no language steering is applied.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/language_codes`.
+                            public typealias language_codesPayload = [Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.language_codesPayloadPayload]
+                            /// Language or languages of the audio, as ISO language codes. A code outside this set is rejected with a `400`. When omitted, no language steering is applied.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/language_codes`.
+                            public var language_codes: Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.language_codesPayload?
+                            /// Context for the transcription: a description of what the audio is about, such as "A doctor dictating a patient visit note." It describes the situation rather than instructing the model, and is prepended to the base transcription prompt, which always applies. Also accepted as `prompt`; send one or the other, or the request is rejected with `400`.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/stt_prompt`.
+                            public var stt_prompt: Swift.String?
+                            /// Terms to bias transcription toward, such as names or jargon. Maximum 100 terms and 8000 characters in total. The legacy names `keyterms` and `word_boost` are also accepted; send only one of the three, or the request is rejected with `400`.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/keyterms_prompt`.
+                            public var keyterms_prompt: [Swift.String]?
+                            /// Plain-English description of the shape you want the text in, which replaces the default cleanup task. Describe only the transformation: rules about output format, refusing to answer the text, and handling clean input are enforced automatically. Omitting the field, or setting it to `null`, keeps the default cleanup task, which removes filler, resolves self-corrections, and applies punctuation and capitalization.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/llm_instruction`.
+                            public var llm_instruction: Swift.String?
+                            /// Model tier that runs the rewrite. `fast`, the default, has the lowest latency. `smart` follows detailed formatting instructions more reliably, but has higher latency. Any other value is rejected with `400`.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/rewrite_mode`.
+                            @frozen public enum rewrite_modePayload: String, Codable, Hashable, Sendable, CaseIterable {
+                                case fast = "fast"
+                                case smart = "smart"
+                            }
+                            /// Model tier that runs the rewrite. `fast`, the default, has the lowest latency. `smart` follows detailed formatting instructions more reliably, but has higher latency. Any other value is rejected with `400`.
+                            ///
+                            /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/config/content/body/rewrite_mode`.
+                            public var rewrite_mode: Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.rewrite_modePayload?
+                            /// Creates a new `bodyPayload`.
+                            ///
+                            /// - Parameters:
+                            ///   - sample_rate: Source sample rate in Hz, for example `16000`. Required when `audio` is `audio/pcm`. Not needed for WAV or compressed formats, which carry it in the file.
+                            ///   - channels: Number of audio channels. Required when `audio` is `audio/pcm`. Not needed for WAV or compressed formats.
+                            ///   - language_codes: Language or languages of the audio, as ISO language codes. A code outside this set is rejected with a `400`. When omitted, no language steering is applied.
+                            ///   - stt_prompt: Context for the transcription: a description of what the audio is about, such as "A doctor dictating a patient visit note." It describes the situation rather than instructing the model, and is prepended to the base transcription prompt, which always applies. Also accepted as `prompt`; send one or the other, or the request is rejected with `400`.
+                            ///   - keyterms_prompt: Terms to bias transcription toward, such as names or jargon. Maximum 100 terms and 8000 characters in total. The legacy names `keyterms` and `word_boost` are also accepted; send only one of the three, or the request is rejected with `400`.
+                            ///   - llm_instruction: Plain-English description of the shape you want the text in, which replaces the default cleanup task. Describe only the transformation: rules about output format, refusing to answer the text, and handling clean input are enforced automatically. Omitting the field, or setting it to `null`, keeps the default cleanup task, which removes filler, resolves self-corrections, and applies punctuation and capitalization.
+                            ///   - rewrite_mode: Model tier that runs the rewrite. `fast`, the default, has the lowest latency. `smart` follows detailed formatting instructions more reliably, but has higher latency. Any other value is rejected with `400`.
+                            public init(
+                                sample_rate: Swift.Int? = nil,
+                                channels: Swift.Int? = nil,
+                                language_codes: Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.language_codesPayload? = nil,
+                                stt_prompt: Swift.String? = nil,
+                                keyterms_prompt: [Swift.String]? = nil,
+                                llm_instruction: Swift.String? = nil,
+                                rewrite_mode: Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.rewrite_modePayload? = nil
+                            ) {
+                                self.sample_rate = sample_rate
+                                self.channels = channels
+                                self.language_codes = language_codes
+                                self.stt_prompt = stt_prompt
+                                self.keyterms_prompt = keyterms_prompt
+                                self.llm_instruction = llm_instruction
+                                self.rewrite_mode = rewrite_mode
+                            }
+                            public enum CodingKeys: String, CodingKey {
+                                case sample_rate
+                                case channels
+                                case language_codes
+                                case stt_prompt
+                                case keyterms_prompt
+                                case llm_instruction
+                                case rewrite_mode
+                            }
+                            public init(from decoder: any Swift.Decoder) throws {
+                                let container = try decoder.container(keyedBy: CodingKeys.self)
+                                self.sample_rate = try container.decodeIfPresent(
+                                    Swift.Int.self,
+                                    forKey: .sample_rate
+                                )
+                                self.channels = try container.decodeIfPresent(
+                                    Swift.Int.self,
+                                    forKey: .channels
+                                )
+                                self.language_codes = try container.decodeIfPresent(
+                                    Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.language_codesPayload.self,
+                                    forKey: .language_codes
+                                )
+                                self.stt_prompt = try container.decodeIfPresent(
+                                    Swift.String.self,
+                                    forKey: .stt_prompt
+                                )
+                                self.keyterms_prompt = try container.decodeIfPresent(
+                                    [Swift.String].self,
+                                    forKey: .keyterms_prompt
+                                )
+                                self.llm_instruction = try container.decodeIfPresent(
+                                    Swift.String.self,
+                                    forKey: .llm_instruction
+                                )
+                                self.rewrite_mode = try container.decodeIfPresent(
+                                    Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload.rewrite_modePayload.self,
+                                    forKey: .rewrite_mode
+                                )
+                                try decoder.ensureNoAdditionalProperties(knownKeys: [
+                                    "sample_rate",
+                                    "channels",
+                                    "language_codes",
+                                    "stt_prompt",
+                                    "keyterms_prompt",
+                                    "llm_instruction",
+                                    "rewrite_mode"
+                                ])
+                            }
+                        }
+                        public var body: Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload
+                        /// Creates a new `configPayload`.
+                        ///
+                        /// - Parameters:
+                        ///   - body:
+                        public init(body: Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload.bodyPayload) {
+                            self.body = body
+                        }
+                    }
+                    case config(OpenAPIRuntime.MultipartPart<Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.configPayload>)
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/multipartForm/audio`.
+                    public struct audioPayload: Sendable, Hashable {
+                        public var body: OpenAPIRuntime.HTTPBody
+                        /// Creates a new `audioPayload`.
+                        ///
+                        /// - Parameters:
+                        ///   - body:
+                        public init(body: OpenAPIRuntime.HTTPBody) {
+                            self.body = body
+                        }
+                    }
+                    case audio(OpenAPIRuntime.MultipartPart<Operations.transcribeDictationRecording.Input.Body.multipartFormPayload.audioPayload>)
+                    case undocumented(OpenAPIRuntime.MultipartRawPart)
+                }
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/requestBody/content/multipart\/form-data`.
+                case multipartForm(OpenAPIRuntime.MultipartBody<Operations.transcribeDictationRecording.Input.Body.multipartFormPayload>)
+            }
+            public var body: Operations.transcribeDictationRecording.Input.Body
+            /// Creates a new `Input`.
+            ///
+            /// - Parameters:
+            ///   - headers:
+            ///   - body:
+            public init(
+                headers: Operations.transcribeDictationRecording.Input.Headers = .init(),
+                body: Operations.transcribeDictationRecording.Input.Body
+            ) {
+                self.headers = headers
+                self.body = body
+            }
+        }
+        @frozen public enum Output: Sendable, Hashable {
+            public struct Ok: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/200/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/200/content/application\/json`.
+                    case json(Components.Schemas.DictationResponse)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.DictationResponse {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.Ok.Body
+                /// Creates a new `Ok`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.Ok.Body) {
+                    self.body = body
+                }
+            }
+            /// Transcription completed. The rewrite is best-effort: a failed rewrite still returns `200` with the transcription, `llm_response` set to `null`, and `llm_error` set. Fall back to `text` in that case, and never treat a non-`null` `llm_error` as a failed request.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/200`.
+            ///
+            /// HTTP response code: `200 ok`.
+            case ok(Operations.transcribeDictationRecording.Output.Ok)
+            /// The associated value of the enum case if `self` is `.ok`.
+            ///
+            /// - Throws: An error if `self` is not `.ok`.
+            /// - SeeAlso: `.ok`.
+            public var ok: Operations.transcribeDictationRecording.Output.Ok {
+                get throws {
+                    switch self {
+                    case let .ok(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "ok",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct BadRequest: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/400/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/400/content/json`.
+                    @frozen public enum jsonPayload: Codable, Hashable, Sendable {
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/400/content/json/case1`.
+                        case ErrorResponse(Components.Schemas.ErrorResponse)
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/400/content/json/case2`.
+                        case DetailErrorResponse(Components.Schemas.DetailErrorResponse)
+                        public init(from decoder: any Swift.Decoder) throws {
+                            var errors: [any Swift.Error] = []
+                            do {
+                                self = .ErrorResponse(try .init(from: decoder))
+                                return
+                            } catch {
+                                errors.append(error)
+                            }
+                            do {
+                                self = .DetailErrorResponse(try .init(from: decoder))
+                                return
+                            } catch {
+                                errors.append(error)
+                            }
+                            throw Swift.DecodingError.failedToDecodeOneOfSchema(
+                                type: Self.self,
+                                codingPath: decoder.codingPath,
+                                errors: errors
+                            )
+                        }
+                        public func encode(to encoder: any Swift.Encoder) throws {
+                            switch self {
+                            case let .ErrorResponse(value):
+                                try value.encode(to: encoder)
+                            case let .DetailErrorResponse(value):
+                                try value.encode(to: encoder)
+                            }
+                        }
+                    }
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/400/content/application\/json`.
+                    case json(Operations.transcribeDictationRecording.Output.BadRequest.Body.jsonPayload)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Operations.transcribeDictationRecording.Output.BadRequest.Body.jsonPayload {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.BadRequest.Body
+                /// Creates a new `BadRequest`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.BadRequest.Body) {
+                    self.body = body
+                }
+            }
+            /// A malformed request body, or a Dictation-specific `config` field that fails validation, uses the `error`/`error_code` shape: a missing or empty `audio` part, an `audio` part over 256 MB, or `config` that is not valid JSON. Audio shorter than 80 ms, audio that cannot be decoded, and a transcription `config` field that fails validation, including an unknown field, use the `status`/`title`/`detail` shape instead.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/400`.
+            ///
+            /// HTTP response code: `400 badRequest`.
+            case badRequest(Operations.transcribeDictationRecording.Output.BadRequest)
+            /// The associated value of the enum case if `self` is `.badRequest`.
+            ///
+            /// - Throws: An error if `self` is not `.badRequest`.
+            /// - SeeAlso: `.badRequest`.
+            public var badRequest: Operations.transcribeDictationRecording.Output.BadRequest {
+                get throws {
+                    switch self {
+                    case let .badRequest(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badRequest",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct Unauthorized: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/401/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/401/content/application\/json`.
+                    case json(Components.Schemas.DetailErrorResponse)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.DetailErrorResponse {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.Unauthorized.Body
+                /// Creates a new `Unauthorized`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.Unauthorized.Body) {
+                    self.body = body
+                }
+            }
+            /// Missing `Authorization` header, or an invalid API key.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/401`.
+            ///
+            /// HTTP response code: `401 unauthorized`.
+            case unauthorized(Operations.transcribeDictationRecording.Output.Unauthorized)
+            /// The associated value of the enum case if `self` is `.unauthorized`.
+            ///
+            /// - Throws: An error if `self` is not `.unauthorized`.
+            /// - SeeAlso: `.unauthorized`.
+            public var unauthorized: Operations.transcribeDictationRecording.Output.Unauthorized {
+                get throws {
+                    switch self {
+                    case let .unauthorized(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unauthorized",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct ContentTooLarge: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/413/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/413/content/application\/json`.
+                    case json(Components.Schemas.DetailErrorResponse)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.DetailErrorResponse {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.ContentTooLarge.Body
+                /// Creates a new `ContentTooLarge`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.ContentTooLarge.Body) {
+                    self.body = body
+                }
+            }
+            /// The audio is longer than 20 minutes (`title: "Audio Too Large"`).
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/413`.
+            ///
+            /// HTTP response code: `413 contentTooLarge`.
+            case contentTooLarge(Operations.transcribeDictationRecording.Output.ContentTooLarge)
+            /// The associated value of the enum case if `self` is `.contentTooLarge`.
+            ///
+            /// - Throws: An error if `self` is not `.contentTooLarge`.
+            /// - SeeAlso: `.contentTooLarge`.
+            public var contentTooLarge: Operations.transcribeDictationRecording.Output.ContentTooLarge {
+                get throws {
+                    switch self {
+                    case let .contentTooLarge(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "contentTooLarge",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct UnsupportedMediaType: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/415/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/415/content/application\/json`.
+                    case json(Components.Schemas.DetailErrorResponse)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.DetailErrorResponse {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.UnsupportedMediaType.Body
+                /// Creates a new `UnsupportedMediaType`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.UnsupportedMediaType.Body) {
+                    self.body = body
+                }
+            }
+            /// The `audio` part's Content-Type is not a supported format.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/415`.
+            ///
+            /// HTTP response code: `415 unsupportedMediaType`.
+            case unsupportedMediaType(Operations.transcribeDictationRecording.Output.UnsupportedMediaType)
+            /// The associated value of the enum case if `self` is `.unsupportedMediaType`.
+            ///
+            /// - Throws: An error if `self` is not `.unsupportedMediaType`.
+            /// - SeeAlso: `.unsupportedMediaType`.
+            public var unsupportedMediaType: Operations.transcribeDictationRecording.Output.UnsupportedMediaType {
+                get throws {
+                    switch self {
+                    case let .unsupportedMediaType(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "unsupportedMediaType",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct TooManyRequests: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/429/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/429/content/application\/json`.
+                    case json(Components.Schemas.DetailErrorResponse)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.DetailErrorResponse {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.TooManyRequests.Body
+                /// Creates a new `TooManyRequests`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.TooManyRequests.Body) {
+                    self.body = body
+                }
+            }
+            /// Rate limited. Back off and retry.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/429`.
+            ///
+            /// HTTP response code: `429 tooManyRequests`.
+            case tooManyRequests(Operations.transcribeDictationRecording.Output.TooManyRequests)
+            /// The associated value of the enum case if `self` is `.tooManyRequests`.
+            ///
+            /// - Throws: An error if `self` is not `.tooManyRequests`.
+            /// - SeeAlso: `.tooManyRequests`.
+            public var tooManyRequests: Operations.transcribeDictationRecording.Output.TooManyRequests {
+                get throws {
+                    switch self {
+                    case let .tooManyRequests(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "tooManyRequests",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct BadGateway: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/502/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/502/content/application\/json`.
+                    case json(Components.Schemas.ErrorResponse)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Components.Schemas.ErrorResponse {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.BadGateway.Body
+                /// Creates a new `BadGateway`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.BadGateway.Body) {
+                    self.body = body
+                }
+            }
+            /// Transcription upstream unavailable (`error_code: "upstream_error"`). Retry once, then surface an error.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/502`.
+            ///
+            /// HTTP response code: `502 badGateway`.
+            case badGateway(Operations.transcribeDictationRecording.Output.BadGateway)
+            /// The associated value of the enum case if `self` is `.badGateway`.
+            ///
+            /// - Throws: An error if `self` is not `.badGateway`.
+            /// - SeeAlso: `.badGateway`.
+            public var badGateway: Operations.transcribeDictationRecording.Output.BadGateway {
+                get throws {
+                    switch self {
+                    case let .badGateway(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "badGateway",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct ServiceUnavailable: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/503/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/503/content/json`.
+                    @frozen public enum jsonPayload: Codable, Hashable, Sendable {
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/503/content/json/case1`.
+                        case ErrorResponse(Components.Schemas.ErrorResponse)
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/503/content/json/case2`.
+                        case DetailErrorResponse(Components.Schemas.DetailErrorResponse)
+                        public init(from decoder: any Swift.Decoder) throws {
+                            var errors: [any Swift.Error] = []
+                            do {
+                                self = .ErrorResponse(try .init(from: decoder))
+                                return
+                            } catch {
+                                errors.append(error)
+                            }
+                            do {
+                                self = .DetailErrorResponse(try .init(from: decoder))
+                                return
+                            } catch {
+                                errors.append(error)
+                            }
+                            throw Swift.DecodingError.failedToDecodeOneOfSchema(
+                                type: Self.self,
+                                codingPath: decoder.codingPath,
+                                errors: errors
+                            )
+                        }
+                        public func encode(to encoder: any Swift.Encoder) throws {
+                            switch self {
+                            case let .ErrorResponse(value):
+                                try value.encode(to: encoder)
+                            case let .DetailErrorResponse(value):
+                                try value.encode(to: encoder)
+                            }
+                        }
+                    }
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/503/content/application\/json`.
+                    case json(Operations.transcribeDictationRecording.Output.ServiceUnavailable.Body.jsonPayload)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Operations.transcribeDictationRecording.Output.ServiceUnavailable.Body.jsonPayload {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.ServiceUnavailable.Body
+                /// Creates a new `ServiceUnavailable`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.ServiceUnavailable.Body) {
+                    self.body = body
+                }
+            }
+            /// Server at capacity. Back off and retry.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/503`.
+            ///
+            /// HTTP response code: `503 serviceUnavailable`.
+            case serviceUnavailable(Operations.transcribeDictationRecording.Output.ServiceUnavailable)
+            /// The associated value of the enum case if `self` is `.serviceUnavailable`.
+            ///
+            /// - Throws: An error if `self` is not `.serviceUnavailable`.
+            /// - SeeAlso: `.serviceUnavailable`.
+            public var serviceUnavailable: Operations.transcribeDictationRecording.Output.ServiceUnavailable {
+                get throws {
+                    switch self {
+                    case let .serviceUnavailable(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "serviceUnavailable",
+                            response: self
+                        )
+                    }
+                }
+            }
+            public struct GatewayTimeout: Sendable, Hashable {
+                /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/504/content`.
+                @frozen public enum Body: Sendable, Hashable {
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/504/content/json`.
+                    @frozen public enum jsonPayload: Codable, Hashable, Sendable {
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/504/content/json/case1`.
+                        case ErrorResponse(Components.Schemas.ErrorResponse)
+                        /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/504/content/json/case2`.
+                        case DetailErrorResponse(Components.Schemas.DetailErrorResponse)
+                        public init(from decoder: any Swift.Decoder) throws {
+                            var errors: [any Swift.Error] = []
+                            do {
+                                self = .ErrorResponse(try .init(from: decoder))
+                                return
+                            } catch {
+                                errors.append(error)
+                            }
+                            do {
+                                self = .DetailErrorResponse(try .init(from: decoder))
+                                return
+                            } catch {
+                                errors.append(error)
+                            }
+                            throw Swift.DecodingError.failedToDecodeOneOfSchema(
+                                type: Self.self,
+                                codingPath: decoder.codingPath,
+                                errors: errors
+                            )
+                        }
+                        public func encode(to encoder: any Swift.Encoder) throws {
+                            switch self {
+                            case let .ErrorResponse(value):
+                                try value.encode(to: encoder)
+                            case let .DetailErrorResponse(value):
+                                try value.encode(to: encoder)
+                            }
+                        }
+                    }
+                    /// - Remark: Generated from `#/paths/v1/transcribe/POST/responses/504/content/application\/json`.
+                    case json(Operations.transcribeDictationRecording.Output.GatewayTimeout.Body.jsonPayload)
+                    /// The associated value of the enum case if `self` is `.json`.
+                    ///
+                    /// - Throws: An error if `self` is not `.json`.
+                    /// - SeeAlso: `.json`.
+                    public var json: Operations.transcribeDictationRecording.Output.GatewayTimeout.Body.jsonPayload {
+                        get throws {
+                            switch self {
+                            case let .json(body):
+                                return body
+                            }
+                        }
+                    }
+                }
+                /// Received HTTP response body
+                public var body: Operations.transcribeDictationRecording.Output.GatewayTimeout.Body
+                /// Creates a new `GatewayTimeout`.
+                ///
+                /// - Parameters:
+                ///   - body: Received HTTP response body
+                public init(body: Operations.transcribeDictationRecording.Output.GatewayTimeout.Body) {
+                    self.body = body
+                }
+            }
+            /// Transcription timed out. Retry once, then surface an error.
+            ///
+            /// - Remark: Generated from `#/paths//v1/transcribe/post(transcribeDictationRecording)/responses/504`.
+            ///
+            /// HTTP response code: `504 gatewayTimeout`.
+            case gatewayTimeout(Operations.transcribeDictationRecording.Output.GatewayTimeout)
+            /// The associated value of the enum case if `self` is `.gatewayTimeout`.
+            ///
+            /// - Throws: An error if `self` is not `.gatewayTimeout`.
+            /// - SeeAlso: `.gatewayTimeout`.
+            public var gatewayTimeout: Operations.transcribeDictationRecording.Output.GatewayTimeout {
+                get throws {
+                    switch self {
+                    case let .gatewayTimeout(response):
+                        return response
+                    default:
+                        try throwUnexpectedResponseStatus(
+                            expectedStatus: "gatewayTimeout",
+                            response: self
+                        )
+                    }
+                }
+            }
+            /// Undocumented response.
+            ///
+            /// A response with a code that is not documented in the OpenAPI document.
+            case undocumented(statusCode: Swift.Int, OpenAPIRuntime.UndocumentedPayload)
+        }
+        @frozen public enum AcceptableContentType: AcceptableProtocol {
+            case json
+            case other(Swift.String)
+            public init?(rawValue: Swift.String) {
+                switch rawValue.lowercased() {
+                case "application/json":
+                    self = .json
+                default:
+                    self = .other(rawValue)
+                }
+            }
+            public var rawValue: Swift.String {
+                switch self {
+                case let .other(string):
+                    return string
+                case .json:
+                    return "application/json"
+                }
+            }
+            public static var allCases: [Self] {
+                [
+                    .json
+                ]
+            }
+        }
+    }
     /// Pre-warm the connection
     ///
     /// Open a connection before sending audio. No authentication is required. Call shortly before transcription using the same HTTP client and host so the transcription can reuse the connection pool. The response body is only an acknowledgement.
