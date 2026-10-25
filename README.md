@@ -8,6 +8,7 @@ memory.
 | Endpoint | Swift method | Authentication |
 | --- | --- | --- |
 | `POST /v1/transcribe/live` | `client.transcribeDictation(body:)` | AssemblyAI API key |
+| `POST /v1/transcribe` | `client.transcribeDictationRecording(body:)` | AssemblyAI API key |
 | `GET /warm` | `client.warm()` | None |
 
 The client and models are generated with `swift-openapi-generator`. Choose either
@@ -346,8 +347,8 @@ See [AssemblyAI's upload-while-recording guide](https://www.assemblyai.com/docs/
 | File | What to look at |
 | --- | --- |
 | [FileHandle+AsyncSequence.swift](Tests/AssemblyAIDictationAPILiveTests/FileHandle+AsyncSequence.swift) | 64 KiB reads and EOF handling |
-| [DictationRequest.swift](Tests/AssemblyAIDictationAPILiveTests/DictationRequest.swift) | Config first, then streaming WAV audio |
-| [AssemblyAIDictationAPILiveTests.swift](Tests/AssemblyAIDictationAPILiveTests/AssemblyAIDictationAPILiveTests.swift) | Both endpoints with both transport factories; response handling |
+| [DictationRequest.swift](Tests/AssemblyAIDictationAPILiveTests/DictationRequest.swift) | Streaming WAV request bodies: config first for live audio, audio only for recordings |
+| [AssemblyAIDictationAPILiveTests.swift](Tests/AssemblyAIDictationAPILiveTests/AssemblyAIDictationAPILiveTests.swift) | All three endpoints with both transport factories; response handling |
 | [DictationStreamingTests.swift](Tests/AssemblyAIDictationAPILiveTests/DictationStreamingTests.swift) | Offline verification of chunking, multipart order, content type, and bytes |
 | [WarmTests.swift](Tests/AssemblyAIDictationAPITests/WarmTests.swift) | Offline checks that warming never requests or sends credentials |
 
@@ -364,20 +365,25 @@ the process environment; tests do not load `.env` automatically. Audio files are
 ignored by Git and must be supplied locally.
 
 ```bash
-# Both endpoints, with both transports:
+# All three endpoints, with both transports:
 ASSEMBLYAI_RUN_LIVE_TESTS=1 swift test --filter AssemblyAIDictationAPILiveTests
 
 # Warm only; no API key or audio file needed:
 ASSEMBLYAI_RUN_LIVE_TESTS=1 swift test --filter 'AssemblyAIDictationAPILiveTests/warm'
 
-# Transcription only:
+# Both transcription endpoints:
 ASSEMBLYAI_RUN_LIVE_TESTS=1 swift test --filter 'AssemblyAIDictationAPILiveTests/transcribeDictation'
+
+# Recorded-audio transcription only:
+ASSEMBLYAI_RUN_LIVE_TESTS=1 swift test --filter 'AssemblyAIDictationAPILiveTests/transcribeDictationRecording'
 ```
 
 Each test runs once with URLSession and once with AsyncHTTPClient. The full live
-suite makes **two warm requests and two transcription requests** to the global
-host. Transcription requests may incur charges. Warm and transcription are
-separate tests; the suite does not measure connection reuse or latency.
+suite makes **two warm requests and four transcription requests** to the global
+host: two to `/v1/transcribe/live` and two to `/v1/transcribe`. The recording test
+omits config to exercise the default cleanup. Transcription requests may incur
+charges. Warm and transcription are separate tests; the suite does not measure
+connection reuse or latency.
 
 ## Advanced client configuration
 

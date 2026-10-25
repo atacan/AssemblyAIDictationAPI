@@ -91,6 +91,61 @@ struct AssemblyAIDictationAPILiveTests {
             #expect(!rewrite.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
     }
+
+    @Test("POST /v1/transcribe transcribes recorded WAV audio without config", arguments: LiveTransport.allCases)
+    func transcribeDictationRecording(transport: LiveTransport) async throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard let apiKey = environment["ASSEMBLYAI_API_KEY"],
+            !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else {
+            throw LiveTestError.missingAPIKey
+        }
+
+        let audioURL =
+            environment["ASSEMBLYAI_AUDIO_FILE"].map { URL(fileURLWithPath: $0) }
+            ?? URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("amazing-things.wav")
+        let file = try FileHandle(forReadingFrom: audioURL)
+        defer { try? file.close() }
+
+        let client = try transport.makeClient(authentication: .apiKey(apiKey))
+        let output: Operations.transcribeDictationRecording.Output
+        do {
+            output = try await client.transcribeDictationRecording(body: recordingDictationBody(file: file, filename: audioURL.lastPathComponent))
+        } catch {
+            // Keep authenticated requests out of test failure messages.
+            throw LiveTestError.requestFailed
+        }
+
+        let response: Components.Schemas.DictationResponse
+        switch output {
+        case .ok(let value): response = try value.body.json
+        case .badRequest: throw LiveTestError.unexpectedStatus(400)
+        case .unauthorized: throw LiveTestError.unexpectedStatus(401)
+        case .contentTooLarge: throw LiveTestError.unexpectedStatus(413)
+        case .unsupportedMediaType: throw LiveTestError.unexpectedStatus(415)
+        case .tooManyRequests: throw LiveTestError.unexpectedStatus(429)
+        case .badGateway: throw LiveTestError.unexpectedStatus(502)
+        case .serviceUnavailable: throw LiveTestError.unexpectedStatus(503)
+        case .gatewayTimeout: throw LiveTestError.unexpectedStatus(504)
+        case .undocumented(let status, _): throw LiveTestError.unexpectedStatus(status)
+        }
+
+        #expect(!response.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        #expect(!response.words.isEmpty)
+        #expect(response.words.allSatisfy { !$0.text.isEmpty && (0 ... 1).contains($0.confidence) })
+        #expect((0 ... 1).contains(response.confidence))
+        #expect(response.audio_duration_ms > 0 && response.audio_duration_ms <= 1_200_000)
+        #expect(UUID(uuidString: response.session_id) != nil)
+
+        if response.llm_error == nil {
+            let rewrite = try #require(response.llm_response)
+            #expect(!rewrite.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+    }
 }
 
 enum LiveTransport: String, CaseIterable, Sendable {
